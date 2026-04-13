@@ -3,7 +3,7 @@
 Una raccolta di macro VBA per velocizzare l’editing e l’adattamento di presentazioni PowerPoint:
 applicare loghi, rimuovere animazioni, uniformare font, pulire slide vuote e molto altro.
 
-## ✨ Funzionalità (v1.2)
+## ✨ Funzionalità (v1.3)
 
 - Copia un oggetto selezionato in tutte le diapositive
 - Rimuove oggetti con un certo nome da tutte le slide
