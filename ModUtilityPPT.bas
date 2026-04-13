@@ -1,13 +1,16 @@
 ' ============================================================
 '  ModUtilityPPT.bas
-'  PowerPoint VBA Utilities – v1.0
+'  PowerPoint VBA Utilities – v1.1
 '
 '  Scopo:
 '    Raccolta di macro per l’editing rapido di presentazioni:
 '    - Copia oggetti su tutte le slide
 '    - Pulizia animazioni e transizioni
-'    - Uniformazione font
+'    - Uniformazione font, colori testo, dimensioni font
+'    - Formattazione testo (grassetto, corsivo, etc.)
+'    - Gestione numeri slide, layout, rinominazione
 '    - Eliminazione slide vuote
+'    - Cerca e sostituisci testo
 '
 '  Uso:
 '    Importare questo modulo in una presentazione .pptm
@@ -167,4 +170,224 @@ Sub EliminaSlideVuote()
     Next i
 
     MsgBox "Slide vuote eliminate: " & countDel, vbInformation
+End Sub
+
+
+' ------------------------------------------------------------
+' 7. Cerca e sostituisci testo in tutte le slide
+'
+' Descrizione:
+'   - Chiede il testo da cercare e quello di sostituzione.
+'   - Sostituisce in tutto il testo delle forme di tutte le slide.
+' ------------------------------------------------------------
+Sub CercaSostituisciTesto()
+    Dim findText As String
+    Dim replaceText As String
+    Dim sld As Slide
+    Dim shp As Shape
+    Dim countRepl As Long
+
+    findText = InputBox("Testo da cercare:", "Cerca e sostituisci")
+    If findText = "" Then Exit Sub
+
+    replaceText = InputBox("Testo di sostituzione:", "Cerca e sostituisci")
+    If replaceText = "" Then Exit Sub
+
+    For Each sld In ActivePresentation.Slides
+        For Each shp In sld.Shapes
+            If shp.HasTextFrame Then
+                If shp.TextFrame.HasText Then
+                    countRepl = countRepl + shp.TextFrame.TextRange.Replace(findText, replaceText)
+                End If
+            End If
+        Next shp
+    Next sld
+
+    MsgBox "Sostituzioni effettuate: " & countRepl, vbInformation
+End Sub
+
+
+' ------------------------------------------------------------
+' 8. Uniforma colore testo in tutta la presentazione
+'
+' Descrizione:
+'   - Chiede il colore RGB come R,G,B (es. 255,0,0 per rosso).
+'   - Applica il colore a tutto il testo di tutte le forme.
+' ------------------------------------------------------------
+Sub UniformaColoreTesto()
+    Dim colorInput As String
+    Dim rgbParts() As String
+    Dim r As Integer, g As Integer, b As Integer
+    Dim sld As Slide
+    Dim shp As Shape
+
+    colorInput = InputBox("Inserisci colore RGB come R,G,B (es. 0,0,0 per nero):", "Uniforma colore testo")
+    If colorInput = "" Then Exit Sub
+
+    rgbParts = Split(colorInput, ",")
+    If UBound(rgbParts) <> 2 Then
+        MsgBox "Formato non valido. Usa R,G,B.", vbExclamation
+        Exit Sub
+    End If
+
+    r = Val(Trim(rgbParts(0)))
+    g = Val(Trim(rgbParts(1)))
+    b = Val(Trim(rgbParts(2)))
+
+    For Each sld In ActivePresentation.Slides
+        For Each shp In sld.Shapes
+            If shp.HasTextFrame Then
+                If shp.TextFrame.HasText Then
+                    shp.TextFrame.TextRange.Font.Color.RGB = RGB(r, g, b)
+                End If
+            End If
+        Next shp
+    Next sld
+
+    MsgBox "Colore applicato a tutto il testo.", vbInformation
+End Sub
+
+
+' ------------------------------------------------------------
+' 9. Imposta dimensione font in tutta la presentazione
+'
+' Descrizione:
+'   - Chiede la dimensione del font.
+'   - Applica la dimensione a tutto il testo di tutte le forme.
+' ------------------------------------------------------------
+Sub ImpostaDimensioneFont()
+    Dim fontSize As Single
+    Dim sld As Slide
+    Dim shp As Shape
+
+    fontSize = Val(InputBox("Inserisci dimensione font (es. 24):", "Imposta dimensione font"))
+    If fontSize <= 0 Then Exit Sub
+
+    For Each sld In ActivePresentation.Slides
+        For Each shp In sld.Shapes
+            If shp.HasTextFrame Then
+                If shp.TextFrame.HasText Then
+                    shp.TextFrame.TextRange.Font.Size = fontSize
+                End If
+            End If
+        Next shp
+    Next sld
+
+    MsgBox "Dimensione font " & fontSize & " applicata a tutto il testo.", vbInformation
+End Sub
+
+
+' ------------------------------------------------------------
+' 10. Applica formattazione testo in tutta la presentazione
+'
+' Descrizione:
+'   - Chiede il tipo di formattazione: bold, italic, underline, normal.
+'   - Applica a tutto il testo di tutte le forme.
+' ------------------------------------------------------------
+Sub FormattaTesto()
+    Dim formatType As String
+    Dim sld As Slide
+    Dim shp As Shape
+
+    formatType = LCase(Trim(InputBox("Tipo di formattazione (bold, italic, underline, normal):", "Formattazione testo")))
+    If formatType = "" Then Exit Sub
+
+    For Each sld In ActivePresentation.Slides
+        For Each shp In sld.Shapes
+            If shp.HasTextFrame Then
+                If shp.TextFrame.HasText Then
+                    Select Case formatType
+                        Case "bold"
+                            shp.TextFrame.TextRange.Font.Bold = msoTrue
+                        Case "italic"
+                            shp.TextFrame.TextRange.Font.Italic = msoTrue
+                        Case "underline"
+                            shp.TextFrame.TextRange.Font.Underline = msoTrue
+                        Case "normal"
+                            shp.TextFrame.TextRange.Font.Bold = msoFalse
+                            shp.TextFrame.TextRange.Font.Italic = msoFalse
+                            shp.TextFrame.TextRange.Font.Underline = msoFalse
+                        Case Else
+                            MsgBox "Tipo non valido.", vbExclamation
+                            Exit Sub
+                    End Select
+                End If
+            End If
+        Next shp
+    Next sld
+
+    MsgBox "Formattazione '" & formatType & "' applicata a tutto il testo.", vbInformation
+End Sub
+
+
+' ------------------------------------------------------------
+' 11. Aggiungi numeri di pagina a tutte le slide
+'
+' Descrizione:
+'   - Aggiunge il numero di pagina nel footer di ogni slide.
+' ------------------------------------------------------------
+Sub AggiungiNumeriSlide()
+    Dim sld As Slide
+
+    For Each sld In ActivePresentation.Slides
+        sld.HeadersFooters.SlideNumber.Visible = msoTrue
+        sld.HeadersFooters.Footer.Text = "&[SlideNumber]"
+    Next sld
+
+    MsgBox "Numeri di pagina aggiunti a tutte le slide.", vbInformation
+End Sub
+
+
+' ------------------------------------------------------------
+' 12. Resetta layout delle slide
+'
+' Descrizione:
+'   - Chiede il nome del layout da applicare.
+'   - Applica il layout a tutte le slide.
+' ------------------------------------------------------------
+Sub ResettaLayoutSlide()
+    Dim layoutName As String
+    Dim layout As PpSlideLayout
+    Dim sld As Slide
+
+    layoutName = InputBox("Nome del layout da applicare (es. Title Slide, Blank):", "Resetta layout")
+    If layoutName = "" Then Exit Sub
+
+    ' Trova il layout corrispondente
+    Select Case LCase(layoutName)
+        Case "title slide"
+            layout = ppLayoutTitle
+        Case "title and content"
+            layout = ppLayoutTitleAndContent
+        Case "blank"
+            layout = ppLayoutBlank
+        Case "two content"
+            layout = ppLayoutTwoContent
+        Case Else
+            MsgBox "Layout non riconosciuto.", vbExclamation
+            Exit Sub
+    End Select
+
+    For Each sld In ActivePresentation.Slides
+        sld.Layout = layout
+    Next sld
+
+    MsgBox "Layout '" & layoutName & "' applicato a tutte le slide.", vbInformation
+End Sub
+
+
+' ------------------------------------------------------------
+' 13. Rinomina slide in batch
+'
+' Descrizione:
+'   - Rinomina ogni slide come "Slide_X" dove X è il numero.
+' ------------------------------------------------------------
+Sub RinominaSlide()
+    Dim sld As Slide
+
+    For Each sld In ActivePresentation.Slides
+        sld.Name = "Slide_" & sld.SlideIndex
+    Next sld
+
+    MsgBox "Slide rinominate.", vbInformation
 End Sub
