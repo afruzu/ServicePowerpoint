@@ -2,6 +2,8 @@
 
 Una raccolta di macro VBA per velocizzare l’editing e l’adattamento di presentazioni PowerPoint:
 applicare loghi, rimuovere animazioni, uniformare font, pulire slide vuote e molto altro.
+per comodità di lettura la libreria all'aumentare del numero di routines implementate è suddivisa in più moduli 
+(attualmente due) - da caricare all'occorrenza.
 
 ## ✨ Funzionalità (v1.3)
 
