@@ -391,3 +391,99 @@ Sub RinominaSlide()
 
     MsgBox "Slide rinominate.", vbInformation
 End Sub
+
+' ------------------------------------------------------------
+' 14. Calcola area bianca disponibile nella slide
+'
+' Descrizione:
+'   - Chiede i margini occupati da grafica/loghi (sinistro, destro, superiore, inferiore in punti).
+'   - Calcola e mostra l'area libera centrale per testo e immagini.
+'   - Restituisce le coordinate in variabili globali per uso futuro.
+' ------------------------------------------------------------
+Public AreaLiberaLeft As Single
+Public AreaLiberaTop As Single
+Public AreaLiberaWidth As Single
+Public AreaLiberaHeight As Single
+
+Sub CalcolaAreaBiancaDisponibile()
+    Dim margineSinistro As Single
+    Dim margineDestro As Single
+    Dim margineSuperiore As Single
+    Dim margineInferiore As Single
+    Dim slideWidth As Single
+    Dim slideHeight As Single
+
+    slideWidth = ActivePresentation.PageSetup.SlideWidth
+    slideHeight = ActivePresentation.PageSetup.SlideHeight
+
+    margineSinistro = Val(InputBox("Margine sinistro occupato (punti):", "Calcola area bianca", "50"))
+    If margineSinistro < 0 Then margineSinistro = 0
+
+    margineDestro = Val(InputBox("Margine destro occupato (punti):", "Calcola area bianca", "50"))
+    If margineDestro < 0 Then margineDestro = 0
+
+    margineSuperiore = Val(InputBox("Margine superiore occupato (punti):", "Calcola area bianca", "50"))
+    If margineSuperiore < 0 Then margineSuperiore = 0
+
+    margineInferiore = Val(InputBox("Margine inferiore occupato (punti):", "Calcola area bianca", "50"))
+    If margineInferiore < 0 Then margineInferiore = 0
+
+    AreaLiberaLeft = margineSinistro
+    AreaLiberaTop = margineSuperiore
+    AreaLiberaWidth = slideWidth - margineSinistro - margineDestro
+    AreaLiberaHeight = slideHeight - margineSuperiore - margineInferiore
+
+    If AreaLiberaWidth <= 0 Or AreaLiberaHeight <= 0 Then
+        MsgBox "Margini troppo grandi! Area libera nulla.", vbExclamation
+        Exit Sub
+    End If
+
+    MsgBox "Area libera calcolata:" & vbCrLf & _
+           "Left: " & AreaLiberaLeft & " pt" & vbCrLf & _
+           "Top: " & AreaLiberaTop & " pt" & vbCrLf & _
+           "Width: " & AreaLiberaWidth & " pt" & vbCrLf & _
+           "Height: " & AreaLiberaHeight & " pt", vbInformation
+End Sub
+
+' ------------------------------------------------------------
+' 15. Ridimensiona testo per contenere nell'area libera
+'
+' Descrizione:
+'   - Usa l'area libera calcolata da CalcolaAreaBiancaDisponibile.
+'   - Ridimensiona le caselle di testo per farle stare entro l'area libera.
+' ------------------------------------------------------------
+Sub RidimensionaTestoPerAreaLibera()
+    Dim sld As Slide
+    Dim shp As Shape
+    Dim scaleX As Single
+    Dim scaleY As Single
+    Dim scale As Single
+
+    ' Verifica se l'area libera è stata calcolata
+    If AreaLiberaWidth <= 0 Or AreaLiberaHeight <= 0 Then
+        MsgBox "Prima calcola l'area libera con CalcolaAreaBiancaDisponibile.", vbExclamation
+        Exit Sub
+    End If
+
+    For Each sld In ActivePresentation.Slides
+        For Each shp In sld.Shapes
+            If shp.HasTextFrame Then
+                ' Ridimensiona la forma per contenere nell'area libera
+                scaleX = AreaLiberaWidth / shp.Width
+                scaleY = AreaLiberaHeight / shp.Height
+                scale = IIf(scaleX < scaleY, scaleX, scaleY)
+                If scale < 1 Then
+                    shp.Width = shp.Width * scale
+                    shp.Height = shp.Height * scale
+                End If
+                ' Posiziona nell'area libera
+                If shp.Left < AreaLiberaLeft Then shp.Left = AreaLiberaLeft
+                If shp.Top < AreaLiberaTop Then shp.Top = AreaLiberaTop
+                If shp.Left + shp.Width > AreaLiberaLeft + AreaLiberaWidth Then shp.Left = AreaLiberaLeft + AreaLiberaWidth - shp.Width
+                If shp.Top + shp.Height > AreaLiberaTop + AreaLiberaHeight Then shp.Top = AreaLiberaTop + AreaLiberaHeight - shp.Height
+            End If
+        Next shp
+    Next sld
+
+    MsgBox "Testo ridimensionato per contenere nell'area libera.", vbInformation
+End Sub
