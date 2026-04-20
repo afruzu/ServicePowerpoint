@@ -66,3 +66,75 @@ per comodità di lettura la libreria all'aumentare del numero di routines implem
 ## 📄 Licenza
 
 MIT License — vedi file `LICENSE`.
+
+
+############################################################
+
+# PowerPoint VBA Utilities
+
+A collection of VBA macros to speed up editing and customizing PowerPoint presentations:
+apply logos, remove animations, standardize fonts, clear blank slides, and much more.
+For ease of use, the library is divided into multiple modules as the number of implemented routines increases
+(currently two) - to be loaded as needed.
+
+## ✨ Features (v1.3)
+
+- Copy a selected object to all slides
+- Remove named objects from all slides
+- Remove all animations
+- Remove all transitions
+- Match font across the entire presentation
+- Remove blank slides
+- Search and replace text across all slides
+- Match text color across the entire presentation
+- Set font size across the entire presentation
+- Apply text formatting (bold, italic, underline, normal)
+- Add page numbers to all slides
+- Reset slide layout
+- Batch rename slides
+- Calculate available white area on the slide
+- Resize images to fit within the free area
+- Resize text to fit within the free area
+- Resize images across the entire presentation
+- Replace selected image with a new one
+- Align images to the center of slides
+- Remove all images from the presentation
+- Resize images to fit within the slide
+
+## 📦 Installation
+
+1. Open PowerPoint.
+2. Press ALT + F11 to open the VBA editor.
+3. Go to File → Import File… and select ModUtilityPPT.bas and ModImagePPT.bas.
+4. Save the presentation as .pptm or create a .ppam add-in.
+
+## ▶️ Usage
+
+- Select a shape and launch CopyObjectToAllSlides.
+- Launch UniformFont to set a uniform font.
+- Use RemoveAllAnimations and RemoveAllTransitions to “clean up” a presentation.
+- Use DeleteBlankSlides to quickly remove empty slides.
+- Use FindReplaceText to search for and replace text.
+- Use `UniformTextColor` to apply a uniform color to the text.
+- Use `SetFontSize` to set the font size.
+- Use `FormatText` to apply bold, italic, etc.
+- Use `AddSlideNumbers` to add page numbers.
+- Use `ResetSlideLayout` to reapply a layout.
+- Use `RenameSlide` to rename slides.
+- Use `CalculateAvailableWhiteArea` to calculate the free area in the center of the slide.
+- Use `ResizeImagesByFreeArea` to resize images within the free area.
+- Use `ResizeTextByFreeArea` to resize text within the free area.
+- Use `ResizeImages` to resize all images.
+- Use `ReplaceImage` to replace a selected image.
+- Use `AlignImagesCenter` to center images.
+- Use `RemoveAllImages` to remove all images.
+- Use `ResizeImagesForSlide` to resize images to fit the slide dimensions.
+
+## 🛣️ Roadmap
+
+- v2.0: `.ppam` add-in with dedicated buttons in the Ribbon
+- v3.0: GUI (UserForm) for selecting operations
+
+## 📄 License
+
+MIT License — see `LICENSE` file.
